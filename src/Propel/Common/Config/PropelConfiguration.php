@@ -129,6 +129,7 @@ class PropelConfiguration implements ConfigurationInterface
                                     ->arrayNode('attributes')
                                         ->children()
                                             ->booleanNode('ATTR_EMULATE_PREPARES')->defaultFalse()->end()
+                                            ->scalarNode('SQLSRV_ATTR_ENCODING')->end()
                                             ->integerNode('ATTR_TIMEOUT')->min(1)->defaultValue(30)->end()
                                         ->end()
                                     ->end()
