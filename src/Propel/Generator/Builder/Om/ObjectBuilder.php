@@ -1214,7 +1214,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
                 throw new PropelException('Unknown stored set key: ' . \$e->getValue(), \$e->getCode(), \$e);
             }
         }
-        
+
         return \$this->$cloConverted;";
     }
 
@@ -1419,10 +1419,10 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         try {
             \$row = array(0 => null);
             \$dataFetcher = ".$this->getQueryClassName()."::create(null, \$c)->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find(\$con);
-            if (\$dataFetcher instanceof PDODataFetcher) {
-                \$dataFetcher->bindColumn(1, \$row[0], PDO::PARAM_LOB, 0, PDO::SQLSRV_ENCODING_BINARY);
+            if (\$dataFetcher instanceof \Propel\Runtime\DataFetcher\PDODataFetcher) {
+                \$dataFetcher->getDataObject()->getStatement()->bindColumn(1, \$row[0], PDO::PARAM_LOB, 0, PDO::SQLSRV_ENCODING_BINARY);
             }
-            \$row = \$dataFetcher->fetch(PDO::FETCH_BOUND);
+            \$dataFetcher->fetch(PDO::FETCH_BOUND);
             \$dataFetcher->close();";
         } else {
             $script .= "
@@ -1447,13 +1447,8 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
             }";
         } elseif ($column->isLobType() && !$platform->hasStreamBlobImpl()) {
             $script .= "
-            if (\$firstColumn !== null) {
-                \$this->$clo = fopen('php://memory', 'r+');
-                fwrite(\$this->$clo, \$firstColumn);
-                rewind(\$this->$clo);
-            } else {
-                \$this->$clo = null;
-            }";
+                \$this->$clo = \$firstColumn;
+            ";
         } elseif ($column->isPhpPrimitiveType()) {
             $script .= "
             \$this->$clo = (\$firstColumn !== null) ? (".$column->getPhpType().") \$firstColumn : null;";
@@ -1945,7 +1940,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
 
     /**
      * Adds a setter for SET column mutator.
-     * 
+     *
      * @param string &$script The script will be modified in this method.
      * @param Column $col     The current column.
      * @see parent::addColumnMutators()
@@ -2605,9 +2600,9 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
     protected function addToArrayKeyLookUp($phpName, Table $table, $plural)
     {
         if($phpName == "") {
-            $phpName = $table->getPhpName();  
+            $phpName = $table->getPhpName();
         }
-        
+
         $camelCaseName = $table->getCamelCaseName();
         $fieldName = $table->getName();
 
